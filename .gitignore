@@ -1,0 +1,16 @@
+# Bulk artifacts (model weights, calibration outputs, run logs)
+model/
+output/
+bench/
+logs/
+
+# Symlink to off-disk V3 workspace
+v3
+
+# calm fork is a leftover from the abandoned Mixtral phase; not part of the project
+calm/
+# (qmoe is a git submodule — tracked, not ignored)
+
+# Local
+*.pyc
+__pycache__/

@@ -1,0 +1,4 @@
+[submodule "qmoe"]
+	path = qmoe
+	url = https://github.com/erique/qmoe.git
+	branch = moe-ppl-eval
