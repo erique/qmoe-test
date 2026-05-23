@@ -525,11 +525,26 @@ moving to the next:
 
 ### Full V3 curve
 
-| config            | PPL    | ΔPPL    | ship? | est. on-disk size |
-|-------------------|-------:|--------:|:-----:|------------------:|
-| fp16 baseline     |  7.424 |  —      |   —   |  ~1.34 TB         |
-| 1.5-bit QMoE      | 13.768 |  +6.35  |  no   |  ~100 GB          |
-| 3-bit GPTQ        |  7.605 |  +0.18  | **yes** | ~300 GB         |
+| config            | PPL    | ΔPPL    | verdict          | est. on-disk size |
+|-------------------|-------:|--------:|------------------|------------------:|
+| fp16 baseline     |  7.424 |  —      | reference        |  ~1.34 TB         |
+| 1.5-bit QMoE      | 13.768 |  +6.35  | functional, degraded | ~100 GB       |
+| 2-bit GPTQ        |  9.166 |  +1.74  | marginal (just over ship threshold) | ~200 GB |
+| 3-bit GPTQ        |  7.605 |  +0.18  | ship quality     | ~300 GB           |
+
+V3 follows the same smooth-glide pattern V2-Lite established — each bit-width
+step roughly halves the quality gap. None of the destructive cliff we saw on
+Mixtral. The 2-bit point sits just barely outside the ≤1.5 ship threshold —
++1.74 is in the "noticeably degraded but coherent" zone, the smallest
+recognisable-as-V3 deployment at ~200 GB.
+
+### Cross-model 2-bit comparison
+
+| model              | params | 2-bit ΔPPL | verdict      |
+|--------------------|-------:|-----------:|--------------|
+| Mixtral-8x7B-base  |  47 B  | +680.0     | destroyed    |
+| DSV2-Lite-base     |  16 B  |   +5.34    | degraded     |
+| **DSV3-Base**      | **671 B** | **+1.74** | **marginal** |
 
 ### Cross-model 3-bit comparison
 
@@ -717,7 +732,7 @@ architecture.
 |------------------|-------:|-----:|-------------:|-----------:|-----------:|
 | Mixtral-8x7B-base|  47 B  | 6.61 | +1158.7 (destroyed) | +680.0 (destroyed) | +0.83 (ship) |
 | DSV2-Lite-base   |  16 B  | 8.80 | +16.25 (degraded)   | +5.34 (degraded)   | +0.47 (ship) |
-| DSV3-Base        | 671 B  | 7.42 | +6.35 (functional)  | *running*          | +0.18 (ship) |
+| DSV3-Base        | 671 B  | 7.42 | +6.35 (functional)  | +1.74 (marginal)   | +0.18 (ship) |
 
 QMoE-codec design point (1.5-bit ternary) is functional-but-not-ship on V3,
 much better than smaller MoEs. 3-bit GPTQ is drop-in ship quality across all
